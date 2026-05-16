@@ -87,8 +87,8 @@ export default function Dashboard() {
     } finally { setLoading(false) }
   }
 
-  const emailCount = (briefing?.briefing?.urgent?.length || 0) + (briefing?.briefing?.bisa_nanti?.length || 0)
-  const urgentCount = briefing?.briefing?.urgent?.length || 0
+  const emailCount = (briefing?.emails?.length || 0
+  const urgentCount = briefing?.emails?.length || 0
   const highRiskCount = anomalies.filter((a: any) => a.risk_level === 'HIGH').length
 
   return (
@@ -176,7 +176,7 @@ export default function Dashboard() {
               {[
                 { label: 'Email Diproses', value: emailCount, sub: `${urgentCount} urgent`, color: '#3B82F6', icon: '✉' },
                 { label: 'WA Status', value: waStatus?.connected ? 'ON' : 'OFF', sub: waStatus?.connected ? 'WA aktif 24/7' : 'WA offline', color: waStatus?.connected ? '#10B981' : '#4A5C78', icon: '◎' },
-                { label: 'Task Terdeteksi', value: briefing?.briefing?.urgent?.length || 0, sub: 'dari email', color: '#06B6D4', icon: '✓' },
+                { label: 'Task Terdeteksi', value: briefing?.emails?.length || 0, sub: 'dari email', color: '#06B6D4', icon: '✓' },
                 { label: 'Alert Zenith', value: anomalies.length, sub: `${highRiskCount} HIGH RISK`, color: '#EF4444', icon: '⬡' },
               ].map(stat => (
                 <div key={stat.label} style={{ background: '#0D1321', border: '1px solid #1F2D45', borderRadius: '12px', padding: '16px' }}>
@@ -191,9 +191,9 @@ export default function Dashboard() {
             </div>
 
             {/* Briefing summary */}
-            {briefing?.briefing?.summary && (
+            {briefing?.summary && (
               <div style={{ margin: '16px 24px 0', padding: '12px 16px', background: 'rgba(59,130,246,0.06)', border: '1px solid rgba(59,130,246,0.15)', borderRadius: '10px', fontSize: '13px', color: '#8899B4' }}>
-                📋 {briefing.briefing.summary}
+                📋 {briefing?.summary}
               </div>
             )}
 
@@ -251,7 +251,7 @@ export default function Dashboard() {
             <div style={{ fontSize: '11px', color: '#4A5C78', fontWeight: 700, letterSpacing: '0.8px', marginBottom: '14px' }}>AKTIVITAS REAL-TIME</div>
 
             {/* Email urgent */}
-            {briefing?.briefing?.urgent?.map((email: any, i: number) => (
+            {briefing?.emails?.map((email: any, i: number) => (
               <div key={i} style={{ display: 'flex', gap: '10px', paddingBottom: '12px', marginBottom: '12px', borderBottom: '1px solid rgba(31,45,69,0.5)' }}>
                 <div style={{ width: '8px', height: '8px', borderRadius: '50%', marginTop: '3px', flexShrink: 0, background: '#EF4444', boxShadow: '0 0 6px #EF4444' }} />
                 <div style={{ flex: 1 }}>
@@ -272,7 +272,7 @@ export default function Dashboard() {
               </div>
             ))}
 
-            {briefing?.briefing?.urgent?.length === 0 && anomalies.length === 0 && (
+            {!briefing?.emails?.length && anomalies.length === 0 && (
               <div style={{ fontSize: '12px', color: '#4A5C78', textAlign: 'center', padding: '20px 0' }}>
                 ✓ Semua aman, tidak ada aktivitas urgent
               </div>
