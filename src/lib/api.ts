@@ -1,4 +1,4 @@
-const BASE_URL = 'https://web-production-d2935.up.railway.app'
+const BASE_URL = 'https://orion-ai-backend-v2-production.up.railway.app'
 
 export const api = {
   // AUTH
