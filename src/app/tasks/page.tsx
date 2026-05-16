@@ -19,7 +19,7 @@ export default function TasksPage() {
   const loadData = async (userId: string) => {
     try {
       const data = await api.getTasks(userId)
-      setTasks(data?.tasks || data || [])
+      setTasks(data?.tasks?.tasks || [])
     } catch (e) {
       console.log('Error:', e)
     } finally {
