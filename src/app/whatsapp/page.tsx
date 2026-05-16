@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react'
 import { auth } from '@/lib/auth'
 import { api } from '@/lib/api'
 
-const WA_GATEWAY = 'https://worker-production-67d8.up.railway.app'
+const FASTAPI = 'https://web-production-d2935.up.railway.app'
 
 export default function WhatsAppPage() {
   const [user, setUser] = useState<any>(null)
@@ -24,7 +24,7 @@ export default function WhatsAppPage() {
   const loadData = async (userId: string) => {
     try {
       const [statusRes, msgRes] = await Promise.all([
-        fetch(`${WA_GATEWAY}/status?user_id=${userId}`).then(r => r.json()),
+        fetch(`${FASTAPI}/chat/wa-status?user_id=${userId}`).then(r => r.json()),
         api.getWaMessages(userId),
       ])
       setWaStatus(statusRes)
@@ -43,13 +43,7 @@ export default function WhatsAppPage() {
   const triggerConnect = async (userId: string) => {
     setConnecting(true)
     try {
-      await fetch(`${WA_GATEWAY}/connect`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ user_id: userId })
-      })
-      await new Promise(r => setTimeout(r, 8000))
-      const qrRes = await fetch(`${WA_GATEWAY}/qr?user_id=${userId}`).then(r => r.json())
+      const qrRes = await fetch(`${FASTAPI}/chat/wa-qr?user_id=${userId}`).then(r => r.json())
       console.log('QR response:', qrRes)
       setQrCode(qrRes?.qr_url || qrRes?.qr || null)
     } catch (e) {
