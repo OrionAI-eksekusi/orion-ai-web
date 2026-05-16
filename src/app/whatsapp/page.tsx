@@ -4,12 +4,15 @@ import { useState, useEffect } from 'react'
 import { auth } from '@/lib/auth'
 import { api } from '@/lib/api'
 
+const WA_GATEWAY = 'https://worker-production-67d8.up.railway.app'
+
 export default function WhatsAppPage() {
   const [user, setUser] = useState<any>(null)
   const [waStatus, setWaStatus] = useState<any>(null)
   const [qrCode, setQrCode] = useState<string | null>(null)
   const [messages, setMessages] = useState<any[]>([])
   const [loading, setLoading] = useState(true)
+  const [connecting, setConnecting] = useState(false)
 
   useEffect(() => {
     const currentUser = auth.getUser()
@@ -20,21 +23,46 @@ export default function WhatsAppPage() {
 
   const loadData = async (userId: string) => {
     try {
-      const [statusData, msgData] = await Promise.all([
-        api.getWaStatus(userId),
+      const [statusRes, msgRes] = await Promise.all([
+        fetch(`${WA_GATEWAY}/status?user_id=${userId}`).then(r => r.json()),
         api.getWaMessages(userId),
       ])
-      setWaStatus(statusData)
-      setMessages(msgData?.messages || [])
-      if (!statusData?.connected) {
-        const qrData = await api.getWaQr(userId)
-        setQrCode(qrData?.qr || null)
+      setWaStatus(statusRes)
+      setMessages(msgRes?.messages || [])
+
+      if (!statusRes?.connected) {
+        await triggerConnect(userId)
       }
     } catch (e) {
       console.log('Error:', e)
     } finally {
       setLoading(false)
     }
+  }
+
+  const triggerConnect = async (userId: string) => {
+    setConnecting(true)
+    try {
+      await fetch(`${WA_GATEWAY}/connect`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ user_id: userId })
+      })
+      await new Promise(r => setTimeout(r, 8000))
+      const qrRes = await fetch(`${WA_GATEWAY}/qr?user_id=${userId}`).then(r => r.json())
+      setQrCode(qrRes?.qr_url || null)
+    } catch (e) {
+      console.log('Connect error:', e)
+    } finally {
+      setConnecting(false)
+    }
+  }
+
+  const refreshQr = async () => {
+    if (!user) return
+    setQrCode(null)
+    setLoading(true)
+    await loadData(user.user_id)
   }
 
   return (
@@ -72,8 +100,6 @@ export default function WhatsAppPage() {
 
       {/* MAIN */}
       <div style={{ flex: 1, display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
-
-        {/* Header */}
         <div style={{ borderBottom: '1px solid #1F2D45', padding: '0 28px', height: '60px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', backgroundColor: '#0A0F1E', flexShrink: 0 }}>
           <div>
             <div style={{ fontSize: '16px', fontWeight: 700 }}>◎ WhatsApp AI Agent</div>
@@ -84,17 +110,20 @@ export default function WhatsAppPage() {
               <div style={{ width: '6px', height: '6px', borderRadius: '50%', background: waStatus?.connected ? '#10B981' : '#EF4444', boxShadow: `0 0 6px ${waStatus?.connected ? '#10B981' : '#EF4444'}` }} />
               {waStatus?.connected ? 'WA Online' : 'WA Offline'}
             </div>
-            <button onClick={() => loadData(user?.user_id)} style={{ padding: '6px 14px', background: 'rgba(59,130,246,0.1)', border: '1px solid rgba(59,130,246,0.2)', borderRadius: '8px', color: '#60A5FA', fontSize: '12px', fontWeight: 600, cursor: 'pointer', fontFamily: 'inherit' }}>
+            <button onClick={refreshQr} style={{ padding: '6px 14px', background: 'rgba(59,130,246,0.1)', border: '1px solid rgba(59,130,246,0.2)', borderRadius: '8px', color: '#60A5FA', fontSize: '12px', fontWeight: 600, cursor: 'pointer', fontFamily: 'inherit' }}>
               ↻ Refresh
             </button>
           </div>
         </div>
 
         <div style={{ flex: 1, overflow: 'auto', padding: '24px' }}>
-          {loading ? (
-            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '100%', color: '#4A5C78' }}>Loading...</div>
+          {loading || connecting ? (
+            <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', height: '100%', color: '#4A5C78', gap: '16px' }}>
+              <div style={{ fontSize: '32px' }}>◎</div>
+              <div style={{ fontSize: '14px' }}>{connecting ? 'Menghubungkan WhatsApp...' : 'Loading...'}</div>
+              <div style={{ fontSize: '12px', color: '#4A5C78' }}>Mohon tunggu 8-10 detik</div>
+            </div>
           ) : !waStatus?.connected ? (
-            /* QR Code Section */
             <div style={{ maxWidth: '500px', margin: '0 auto', textAlign: 'center' }}>
               <div style={{ background: '#0D1321', border: '1px solid #1F2D45', borderRadius: '16px', padding: '40px' }}>
                 <div style={{ fontSize: '48px', marginBottom: '16px' }}>◎</div>
@@ -105,21 +134,16 @@ export default function WhatsAppPage() {
 
                 {qrCode ? (
                   <div style={{ background: 'white', padding: '20px', borderRadius: '12px', display: 'inline-block', marginBottom: '24px' }}>
-                    <img src={qrCode} alt="QR Code WA" style={{ width: '200px', height: '200px' }} />
+                    <img src={qrCode} alt="QR Code WA" style={{ width: '220px', height: '220px' }} />
                   </div>
                 ) : (
                   <div style={{ background: '#111827', border: '1px solid #1F2D45', borderRadius: '12px', padding: '40px', marginBottom: '24px', color: '#4A5C78', fontSize: '14px' }}>
-                    QR Code sedang dimuat...
+                    Klik tombol di bawah untuk generate QR Code
                   </div>
                 )}
 
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '12px', textAlign: 'left' }}>
-                  {[
-                    'Buka WhatsApp di HP kamu',
-                    'Klik menu ⋮ → Perangkat Tertaut',
-                    'Klik "Tautkan Perangkat"',
-                    'Scan QR code di atas',
-                  ].map((step, i) => (
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '12px', textAlign: 'left', marginBottom: '24px' }}>
+                  {['Buka WhatsApp di HP kamu', 'Klik menu ⋮ → Perangkat Tertaut', 'Klik "Tautkan Perangkat"', 'Scan QR code di atas'].map((step, i) => (
                     <div key={i} style={{ display: 'flex', gap: '12px', alignItems: 'center' }}>
                       <div style={{ width: '24px', height: '24px', borderRadius: '50%', background: 'rgba(59,130,246,0.1)', border: '1px solid rgba(59,130,246,0.2)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '11px', color: '#60A5FA', flexShrink: 0 }}>{i + 1}</div>
                       <span style={{ fontSize: '13px', color: '#8899B4' }}>{step}</span>
@@ -127,13 +151,12 @@ export default function WhatsAppPage() {
                   ))}
                 </div>
 
-                <button onClick={() => loadData(user?.user_id)} style={{ marginTop: '24px', width: '100%', padding: '12px', background: 'linear-gradient(135deg, #3B82F6, #2563EB)', border: 'none', borderRadius: '10px', color: 'white', fontSize: '14px', fontWeight: 600, cursor: 'pointer', fontFamily: 'inherit' }}>
-                  ↻ Refresh Status
+                <button onClick={refreshQr} style={{ width: '100%', padding: '12px', background: 'linear-gradient(135deg, #3B82F6, #2563EB)', border: 'none', borderRadius: '10px', color: 'white', fontSize: '14px', fontWeight: 600, cursor: 'pointer', fontFamily: 'inherit' }}>
+                  ↻ Generate QR Baru
                 </button>
               </div>
             </div>
           ) : (
-            /* Connected - Show Messages */
             <div>
               <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '16px', marginBottom: '24px' }}>
                 {[
@@ -147,15 +170,10 @@ export default function WhatsAppPage() {
                   </div>
                 ))}
               </div>
-
               <div style={{ background: '#0D1321', border: '1px solid #1F2D45', borderRadius: '14px', overflow: 'hidden' }}>
-                <div style={{ padding: '16px 20px', borderBottom: '1px solid #1F2D45', fontSize: '13px', fontWeight: 600 }}>
-                  Pesan Terkini
-                </div>
+                <div style={{ padding: '16px 20px', borderBottom: '1px solid #1F2D45', fontSize: '13px', fontWeight: 600 }}>Pesan Terkini</div>
                 {messages.length === 0 ? (
-                  <div style={{ padding: '40px', textAlign: 'center', color: '#4A5C78', fontSize: '14px' }}>
-                    Belum ada pesan masuk
-                  </div>
+                  <div style={{ padding: '40px', textAlign: 'center', color: '#4A5C78', fontSize: '14px' }}>Belum ada pesan masuk</div>
                 ) : messages.slice(0, 20).map((msg: any, i: number) => (
                   <div key={i} style={{ padding: '14px 20px', borderBottom: '1px solid rgba(31,45,69,0.5)', display: 'flex', gap: '12px', alignItems: 'flex-start' }}>
                     <div style={{ width: '36px', height: '36px', borderRadius: '50%', background: msg.fromMe ? 'linear-gradient(135deg, #3B82F6, #06B6D4)' : '#1F2D45', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '14px', flexShrink: 0 }}>
