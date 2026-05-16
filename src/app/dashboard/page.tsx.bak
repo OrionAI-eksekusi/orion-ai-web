@@ -1,0 +1,432 @@
+'use client'
+
+import { useState } from 'react'
+
+const sidebarItems = [
+  { icon: '◈', label: 'Dashboard', path: '/dashboard', active: true },
+  { icon: '✉', label: 'Email AI', path: '/email' },
+  { icon: '◎', label: 'WhatsApp', path: '/whatsapp' },
+  { icon: '✓', label: 'Tasks', path: '/tasks' },
+  { icon: '◉', label: 'Broadcast', path: '/broadcast' },
+  { icon: '📄', label: 'Quotation', path: '/quotation' },
+]
+
+const zenithItems = [
+  { icon: '⬡', label: 'Price Guard', path: '/zenith/price-guard' },
+  { icon: '◉', label: 'Investigator', path: '/zenith/investigator' },
+  { icon: '◪', label: 'OCR Forensic', path: '/zenith/ocr' },
+  { icon: '◈', label: 'Vendor Intel', path: '/zenith/vendor' },
+  { icon: '✓', label: 'Compliance', path: '/zenith/compliance' },
+]
+
+const quickCommands = [
+  'Laporan harian hari ini',
+  'Cek email urgent',
+  'Blast WA ke semua customer',
+  'Cek alert Zenith',
+  'Buatkan quotation',
+]
+
+export default function Dashboard() {
+  const [command, setCommand] = useState('')
+  const [messages, setMessages] = useState([
+    {
+      role: 'orion',
+      text: '✦ Selamat pagi! Saya sudah memproses 15 email, membalas 23 pesan WA customer, dan mendeteksi 2 alert HIGH RISK di Zenith. Ada yang bisa saya eksekusi sekarang?',
+      time: '06:00',
+    }
+  ])
+  const [loading, setLoading] = useState(false)
+  const [zenithOpen, setZenithOpen] = useState(true)
+
+  const sendCommand = async () => {
+    if (!command.trim() || loading) return
+
+    const userMsg = { role: 'user', text: command, time: new Date().toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' }) }
+    setMessages(prev => [...prev, userMsg])
+    setCommand('')
+    setLoading(true)
+
+    setTimeout(() => {
+      const responses: Record<string, string> = {
+        'laporan': '📊 Laporan Harian — 16 Mei 2026\n\n✉ Email diproses: 15 (3 urgent)\n◎ WA auto-reply: 23 customer\n✓ Task terdeteksi: 8\n⬡ Alert Zenith: 2 HIGH RISK\n💰 Potensi fraud terdeteksi: Rp 13 juta\n\nSemua berjalan normal. Ada yang perlu diinvestigasi?',
+        'email': '✉ Email Urgent Hari Ini\n\n1. PT Maju Jaya — "Konfirmasi pembayaran urgent" — 05:32\n2. CV Berkah — "Penawaran habis hari ini" — 06:10\n3. Supplier ABC — "Invoice terlampir" ⚠️ HIGH RISK\n\nMau saya balas salah satunya?',
+        'blast': '◎ Broadcast WA siap dikirim!\n\nTarget: 47 customer aktif\nStatus: Menunggu konfirmasi pesan\n\nKetik pesan yang ingin dikirim, atau gunakan template promo.',
+        'zenith': '⬡ Alert Zenith Aktif\n\n🔴 HIGH RISK — PT Supplier ABC\nMarkup 108% · Laptop Dell Rp 25jt vs pasar Rp 12jt\nPotensi kerugian: Rp 13 juta\n\n🟡 MEDIUM — CV Logistik Prima\nHarga konsisten 35% di atas pasar\n\nMau investigasi lebih dalam?',
+        'quotation': '📄 Auto Quotation Generator\n\nSebutkan:\n1. Nama customer/perusahaan\n2. Item dan jumlah\n3. Harga per unit\n\nContoh: "Quotation untuk PT ABC, 10 unit laptop Dell, Rp 12 juta per unit"',
+      }
+
+      const key = Object.keys(responses).find(k => command.toLowerCase().includes(k))
+      const reply = key ? responses[key] : `Saya mengerti perintah: "${command}". Sedang memproses dan akan segera dieksekusi. ✦`
+
+      setMessages(prev => [...prev, {
+        role: 'orion',
+        text: reply,
+        time: new Date().toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' }),
+      }])
+      setLoading(false)
+    }, 1200)
+  }
+
+  return (
+    <div style={{
+      display: 'flex', height: '100vh',
+      backgroundColor: '#070B14',
+      color: '#F0F4FF',
+      fontFamily: "'DM Sans', 'Inter', sans-serif",
+      overflow: 'hidden',
+    }}>
+
+      {/* SIDEBAR */}
+      <div style={{
+        width: '220px', flexShrink: 0,
+        borderRight: '1px solid #1F2D45',
+        backgroundColor: '#0A0F1E',
+        display: 'flex', flexDirection: 'column',
+        padding: '20px 12px',
+        overflowY: 'auto',
+      }}>
+        {/* Logo */}
+        <div style={{ display: 'flex', alignItems: 'center', gap: '10px', padding: '4px 8px', marginBottom: '28px' }}>
+          <div style={{
+            width: '30px', height: '30px',
+            background: 'linear-gradient(135deg, #3B82F6, #06B6D4)',
+            borderRadius: '8px', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '14px',
+          }}>✦</div>
+          <span style={{ fontWeight: 800, fontSize: '16px' }}>Orion <span style={{ color: '#3B82F6' }}>AI</span></span>
+        </div>
+
+        {/* Plan badge */}
+        <div style={{
+          background: 'rgba(16,185,129,0.08)', border: '1px solid rgba(16,185,129,0.15)',
+          borderRadius: '8px', padding: '8px 12px', marginBottom: '20px',
+          fontSize: '11px', color: '#10B981', fontWeight: 600,
+        }}>
+          ✦ Trial · 2 hari lagi
+        </div>
+
+        {/* Nav */}
+        <div style={{ fontSize: '10px', color: '#4A5C78', fontWeight: 700, letterSpacing: '0.8px', padding: '0 8px', marginBottom: '8px' }}>MENU</div>
+
+        {sidebarItems.map(item => (
+          <a key={item.label} href={item.path} style={{
+            display: 'flex', alignItems: 'center', gap: '10px',
+            padding: '9px 10px', borderRadius: '8px', marginBottom: '2px',
+            background: item.active ? 'rgba(59,130,246,0.12)' : 'transparent',
+            color: item.active ? '#60A5FA' : '#8899B4',
+            textDecoration: 'none', fontSize: '13px', fontWeight: item.active ? 600 : 400,
+            border: item.active ? '1px solid rgba(59,130,246,0.2)' : '1px solid transparent',
+            transition: 'all 0.15s',
+          }}>
+            <span style={{ fontSize: '12px' }}>{item.icon}</span>
+            {item.label}
+          </a>
+        ))}
+
+        {/* Zenith section */}
+        <div style={{ marginTop: '16px', marginBottom: '8px' }}>
+          <button
+            onClick={() => setZenithOpen(!zenithOpen)}
+            style={{
+              display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+              width: '100%', padding: '8px 10px', borderRadius: '8px',
+              background: 'rgba(245,158,11,0.08)', border: '1px solid rgba(245,158,11,0.15)',
+              color: '#F59E0B', fontSize: '11px', fontWeight: 700,
+              letterSpacing: '0.5px', cursor: 'pointer',
+            }}
+          >
+            <span>⬡ ZENITH PRO</span>
+            <span>{zenithOpen ? '▾' : '▸'}</span>
+          </button>
+
+          {zenithOpen && (
+            <div style={{ marginTop: '4px' }}>
+              {zenithItems.map(item => (
+                <a key={item.label} href={item.path} style={{
+                  display: 'flex', alignItems: 'center', gap: '10px',
+                  padding: '8px 10px 8px 18px', borderRadius: '8px', marginBottom: '2px',
+                  color: '#8899B4', textDecoration: 'none', fontSize: '12px',
+                  border: '1px solid transparent', transition: 'all 0.15s',
+                }}>
+                  <span style={{ fontSize: '10px', color: '#F59E0B' }}>{item.icon}</span>
+                  {item.label}
+                </a>
+              ))}
+            </div>
+          )}
+        </div>
+
+        {/* Bottom */}
+        <div style={{ marginTop: 'auto', paddingTop: '16px', borderTop: '1px solid #1F2D45' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '8px', padding: '8px 10px' }}>
+            <div style={{
+              width: '28px', height: '28px', borderRadius: '50%',
+              background: 'linear-gradient(135deg, #3B82F6, #06B6D4)',
+              display: 'flex', alignItems: 'center', justifyContent: 'center',
+              fontSize: '12px', fontWeight: 700, flexShrink: 0,
+            }}>A</div>
+            <div>
+              <div style={{ fontSize: '12px', fontWeight: 600 }}>Azvicky</div>
+              <div style={{ fontSize: '10px', color: '#4A5C78' }}>Trial Plan</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* MAIN CONTENT */}
+      <div style={{ flex: 1, display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
+
+        {/* Top bar */}
+        <div style={{
+          borderBottom: '1px solid #1F2D45',
+          padding: '0 28px', height: '60px',
+          display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+          backgroundColor: '#0A0F1E', flexShrink: 0,
+        }}>
+          <div>
+            <div style={{ fontSize: '16px', fontWeight: 700 }}>Command Center</div>
+            <div style={{ fontSize: '11px', color: '#4A5C78' }}>Ketik perintah atau pilih fitur — Orion akan mengeksekusi</div>
+          </div>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
+            {/* Status indicators */}
+            <div style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: '12px', color: '#10B981' }}>
+              <div style={{ width: '6px', height: '6px', borderRadius: '50%', background: '#10B981', boxShadow: '0 0 6px #10B981' }} />
+              WA Online
+            </div>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: '12px', color: '#3B82F6' }}>
+              <div style={{ width: '6px', height: '6px', borderRadius: '50%', background: '#3B82F6', boxShadow: '0 0 6px #3B82F6' }} />
+              Gmail Connected
+            </div>
+            {/* Alert badge */}
+            <div style={{
+              background: 'rgba(239,68,68,0.1)', border: '1px solid rgba(239,68,68,0.25)',
+              borderRadius: '8px', padding: '5px 12px',
+              fontSize: '12px', color: '#EF4444', fontWeight: 600,
+              display: 'flex', alignItems: 'center', gap: '6px',
+            }}>
+              <div style={{ width: '6px', height: '6px', borderRadius: '50%', background: '#EF4444', boxShadow: '0 0 6px #EF4444' }} />
+              2 Alert HIGH RISK
+            </div>
+          </div>
+        </div>
+
+        <div style={{ flex: 1, display: 'flex', overflow: 'hidden' }}>
+
+          {/* Chat area */}
+          <div style={{ flex: 1, display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
+
+            {/* Stats row */}
+            <div style={{
+              display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)',
+              gap: '16px', padding: '20px 24px 0', flexShrink: 0,
+            }}>
+              {[
+                { label: 'Email Diproses', value: '15', sub: '3 urgent', color: '#3B82F6', icon: '✉' },
+                { label: 'WA Auto-Reply', value: '23', sub: 'customer terbalas', color: '#10B981', icon: '◎' },
+                { label: 'Task Terdeteksi', value: '8', sub: 'dari email & WA', color: '#06B6D4', icon: '✓' },
+                { label: 'Alert Zenith', value: '2', sub: 'HIGH RISK', color: '#EF4444', icon: '⬡' },
+              ].map(stat => (
+                <div key={stat.label} style={{
+                  background: '#0D1321', border: '1px solid #1F2D45',
+                  borderRadius: '12px', padding: '16px',
+                }}>
+                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '8px' }}>
+                    <div style={{ fontSize: '11px', color: '#4A5C78' }}>{stat.label}</div>
+                    <span style={{ fontSize: '14px', color: stat.color, opacity: 0.7 }}>{stat.icon}</span>
+                  </div>
+                  <div style={{ fontSize: '28px', fontWeight: 800, color: stat.color, lineHeight: 1 }}>{stat.value}</div>
+                  <div style={{ fontSize: '11px', color: '#8899B4', marginTop: '4px' }}>{stat.sub}</div>
+                </div>
+              ))}
+            </div>
+
+            {/* Messages */}
+            <div style={{
+              flex: 1, overflowY: 'auto', padding: '20px 24px',
+              display: 'flex', flexDirection: 'column', gap: '16px',
+            }}>
+              {messages.map((msg, i) => (
+                <div key={i} style={{
+                  display: 'flex',
+                  flexDirection: msg.role === 'user' ? 'row-reverse' : 'row',
+                  alignItems: 'flex-start', gap: '10px',
+                }}>
+                  {/* Avatar */}
+                  <div style={{
+                    width: '32px', height: '32px', borderRadius: '50%', flexShrink: 0,
+                    background: msg.role === 'orion'
+                      ? 'linear-gradient(135deg, #3B82F6, #06B6D4)'
+                      : 'linear-gradient(135deg, #6366F1, #8B5CF6)',
+                    display: 'flex', alignItems: 'center', justifyContent: 'center',
+                    fontSize: '13px', fontWeight: 700,
+                  }}>
+                    {msg.role === 'orion' ? '✦' : 'A'}
+                  </div>
+
+                  {/* Bubble */}
+                  <div style={{ maxWidth: '70%' }}>
+                    <div style={{
+                      background: msg.role === 'orion' ? '#0D1321' : 'rgba(59,130,246,0.12)',
+                      border: `1px solid ${msg.role === 'orion' ? '#1F2D45' : 'rgba(59,130,246,0.2)'}`,
+                      borderRadius: msg.role === 'orion' ? '4px 14px 14px 14px' : '14px 4px 14px 14px',
+                      padding: '12px 16px',
+                      fontSize: '13px', color: '#D1D9E6',
+                      lineHeight: 1.7, whiteSpace: 'pre-line',
+                    }}>
+                      {msg.text}
+                    </div>
+                    <div style={{ fontSize: '10px', color: '#4A5C78', marginTop: '4px', textAlign: msg.role === 'user' ? 'right' : 'left' }}>
+                      {msg.time}
+                    </div>
+                  </div>
+                </div>
+              ))}
+
+              {loading && (
+                <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                  <div style={{
+                    width: '32px', height: '32px', borderRadius: '50%',
+                    background: 'linear-gradient(135deg, #3B82F6, #06B6D4)',
+                    display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '13px',
+                  }}>✦</div>
+                  <div style={{
+                    background: '#0D1321', border: '1px solid #1F2D45',
+                    borderRadius: '4px 14px 14px 14px', padding: '12px 16px',
+                    fontSize: '13px', color: '#4A5C78',
+                  }}>
+                    Orion sedang memproses<span style={{ animation: 'blink 1s infinite' }}>...</span>
+                  </div>
+                </div>
+              )}
+            </div>
+
+            {/* Quick commands */}
+            <div style={{
+              padding: '0 24px 12px', display: 'flex', gap: '8px', flexWrap: 'wrap', flexShrink: 0,
+            }}>
+              {quickCommands.map(cmd => (
+                <button key={cmd} onClick={() => setCommand(cmd)} style={{
+                  background: 'rgba(59,130,246,0.06)', border: '1px solid rgba(59,130,246,0.15)',
+                  borderRadius: '20px', padding: '5px 12px',
+                  fontSize: '12px', color: '#60A5FA', cursor: 'pointer',
+                  transition: 'all 0.15s', fontFamily: 'inherit',
+                }}>
+                  {cmd}
+                </button>
+              ))}
+            </div>
+
+            {/* Input */}
+            <div style={{
+              padding: '12px 24px 20px', flexShrink: 0,
+              borderTop: '1px solid #1F2D45',
+            }}>
+              <div style={{
+                display: 'flex', gap: '12px', alignItems: 'flex-end',
+                background: '#0D1321', border: '1px solid #2D4160',
+                borderRadius: '14px', padding: '12px 16px',
+              }}>
+                <textarea
+                  value={command}
+                  onChange={e => setCommand(e.target.value)}
+                  onKeyDown={e => {
+                    if (e.key === 'Enter' && !e.shiftKey) {
+                      e.preventDefault()
+                      sendCommand()
+                    }
+                  }}
+                  placeholder="Ketik perintah... contoh: 'laporan hari ini' atau 'blast WA promo'"
+                  rows={1}
+                  style={{
+                    flex: 1, background: 'transparent', border: 'none', outline: 'none',
+                    color: '#F0F4FF', fontSize: '14px', resize: 'none',
+                    fontFamily: 'inherit', lineHeight: 1.5,
+                    caretColor: '#3B82F6',
+                  }}
+                />
+                <button onClick={sendCommand} disabled={!command.trim() || loading} style={{
+                  width: '36px', height: '36px', borderRadius: '10px', flexShrink: 0,
+                  background: command.trim() ? 'linear-gradient(135deg, #3B82F6, #2563EB)' : '#1F2D45',
+                  border: 'none', cursor: command.trim() ? 'pointer' : 'default',
+                  display: 'flex', alignItems: 'center', justifyContent: 'center',
+                  fontSize: '16px', color: 'white', transition: 'all 0.2s',
+                }}>
+                  ↑
+                </button>
+              </div>
+              <div style={{ fontSize: '11px', color: '#4A5C78', marginTop: '8px', textAlign: 'center' }}>
+                Enter untuk kirim · Shift+Enter baris baru
+              </div>
+            </div>
+          </div>
+
+          {/* Right panel — Activity */}
+          <div style={{
+            width: '280px', flexShrink: 0,
+            borderLeft: '1px solid #1F2D45',
+            backgroundColor: '#0A0F1E',
+            padding: '20px 16px',
+            overflowY: 'auto',
+          }}>
+            <div style={{ fontSize: '11px', color: '#4A5C78', fontWeight: 700, letterSpacing: '0.8px', marginBottom: '14px' }}>
+              AKTIVITAS REAL-TIME
+            </div>
+
+            {[
+              { time: '06:00', text: 'Smart Briefing terkirim', type: 'info', detail: 'Email + WA' },
+              { time: '05:47', text: 'WA Pak Budi dibalas', type: 'success', detail: 'Auto-reply aktif' },
+              { time: '05:32', text: 'Task terdeteksi', type: 'info', detail: '"Proposal Q2 deadline"' },
+              { time: '04:15', text: 'Invoice HIGH RISK', type: 'danger', detail: 'PT Supplier ABC · Rp 13jt' },
+              { time: '03:41', text: 'Email dibalas otomatis', type: 'success', detail: 'CV Berkah Jaya' },
+              { time: '02:20', text: 'Anomali terdeteksi', type: 'warning', detail: 'Transaksi split invoice' },
+              { time: '01:05', text: 'WA broadcast selesai', type: 'success', detail: '47 customer' },
+            ].map((item, i) => (
+              <div key={i} style={{
+                display: 'flex', gap: '10px', paddingBottom: '12px', marginBottom: '12px',
+                borderBottom: '1px solid rgba(31,45,69,0.5)',
+              }}>
+                <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '4px', flexShrink: 0 }}>
+                  <div style={{
+                    width: '8px', height: '8px', borderRadius: '50%', marginTop: '3px',
+                    background: item.type === 'danger' ? '#EF4444' : item.type === 'success' ? '#10B981' : item.type === 'warning' ? '#F59E0B' : '#3B82F6',
+                    boxShadow: `0 0 6px ${item.type === 'danger' ? '#EF4444' : item.type === 'success' ? '#10B981' : item.type === 'warning' ? '#F59E0B' : '#3B82F6'}`,
+                  }} />
+                  <div style={{ width: '1px', flex: 1, background: 'rgba(31,45,69,0.5)' }} />
+                </div>
+                <div style={{ flex: 1, minWidth: 0 }}>
+                  <div style={{ fontSize: '12px', fontWeight: 500, marginBottom: '2px', color: '#D1D9E6' }}>{item.text}</div>
+                  <div style={{ fontSize: '11px', color: '#4A5C78' }}>{item.detail}</div>
+                  <div style={{ fontSize: '10px', color: '#2D4160', marginTop: '2px' }}>{item.time} WIB</div>
+                </div>
+              </div>
+            ))}
+
+            {/* Zenith Alert */}
+            <div style={{
+              marginTop: '8px',
+              background: 'rgba(239,68,68,0.06)',
+              border: '1px solid rgba(239,68,68,0.2)',
+              borderRadius: '10px', padding: '12px',
+            }}>
+              <div style={{ fontSize: '10px', fontWeight: 700, color: '#EF4444', letterSpacing: '0.5px', marginBottom: '8px' }}>
+                ⬡ ZENITH ALERT
+              </div>
+              <div style={{ fontSize: '12px', fontWeight: 600, color: '#EF4444', marginBottom: '4px' }}>
+                HIGH RISK — PT Supplier ABC
+              </div>
+              <div style={{ fontSize: '11px', color: '#8899B4', lineHeight: 1.5, marginBottom: '10px' }}>
+                Markup 108% · Potensi kerugian Rp 13 juta
+              </div>
+              <a href="/zenith/investigator" style={{
+                display: 'block', textAlign: 'center', padding: '7px',
+                background: 'rgba(239,68,68,0.1)', border: '1px solid rgba(239,68,68,0.2)',
+                borderRadius: '7px', fontSize: '11px', fontWeight: 600,
+                color: '#EF4444', textDecoration: 'none',
+              }}>Investigasi Sekarang →</a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  )
+}
