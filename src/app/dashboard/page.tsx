@@ -87,7 +87,7 @@ export default function Dashboard() {
     } finally { setLoading(false) }
   }
 
-  const emailCount = (briefing?.emails?.length || 0
+  const emailCount = briefing?.emails?.length || 0
   const urgentCount = briefing?.emails?.length || 0
   const highRiskCount = anomalies.filter((a: any) => a.risk_level === 'HIGH').length
 
