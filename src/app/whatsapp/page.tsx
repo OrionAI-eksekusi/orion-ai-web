@@ -50,7 +50,8 @@ export default function WhatsAppPage() {
       })
       await new Promise(r => setTimeout(r, 8000))
       const qrRes = await fetch(`${WA_GATEWAY}/qr?user_id=${userId}`).then(r => r.json())
-      setQrCode(qrRes?.qr_url || null)
+      console.log('QR response:', qrRes)
+      setQrCode(qrRes?.qr_url || qrRes?.qr || null)
     } catch (e) {
       console.log('Connect error:', e)
     } finally {
