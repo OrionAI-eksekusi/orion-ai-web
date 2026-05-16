@@ -73,9 +73,9 @@ export default function LandingPage() {
     <div style={{ minHeight: '100vh', backgroundColor: '#020714', color: '#F0F4FF', fontFamily: "'DM Sans', 'Inter', sans-serif", overflowX: 'hidden' }}>
 
       <canvas ref={canvasRef} style={{ position: 'fixed', inset: 0, zIndex: 0, pointerEvents: 'none' }} />
-
       <div style={{ position: 'fixed', inset: 0, zIndex: 0, pointerEvents: 'none', background: 'radial-gradient(ellipse at 20% 50%, rgba(15,25,70,0.5) 0%, transparent 60%)' }} />
 
+      {/* NAVBAR */}
       <nav style={{ position: 'fixed', top: 0, left: 0, right: 0, zIndex: 100, borderBottom: '1px solid rgba(31,45,69,0.6)', backgroundColor: 'rgba(2,7,20,0.85)', backdropFilter: 'blur(20px)', padding: '0 40px', height: '64px', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
           <div style={{ width: '32px', height: '32px', background: 'linear-gradient(135deg, #3B82F6, #06B6D4)', borderRadius: '8px', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '16px' }}>✦</div>
@@ -92,6 +92,7 @@ export default function LandingPage() {
         </div>
       </nav>
 
+      {/* HERO */}
       <section style={{ position: 'relative', zIndex: 1, maxWidth: '1200px', margin: '0 auto', padding: '160px 40px 120px', display: 'flex', alignItems: 'center', gap: '60px' }}>
         <div style={{ flex: 1 }}>
           <div style={{ display: 'inline-flex', alignItems: 'center', gap: '8px', background: 'rgba(59,130,246,0.1)', border: '1px solid rgba(59,130,246,0.2)', borderRadius: '100px', padding: '6px 16px', marginBottom: '32px', fontSize: '13px', color: '#60A5FA' }}>
@@ -120,6 +121,7 @@ export default function LandingPage() {
           </div>
         </div>
 
+        {/* Robot section */}
         <div style={{ flexShrink: 0, width: '420px', height: '480px', position: 'relative', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
           <div style={{ position: 'absolute', width: '380px', height: '380px', borderRadius: '50%', background: 'radial-gradient(circle, rgba(59,130,246,0.15) 0%, transparent 70%)', animation: 'pulse 3s ease-in-out infinite' }} />
           <div style={{ position: 'absolute', width: '320px', height: '320px', borderRadius: '50%', border: '1px solid rgba(59,130,246,0.2)', animation: 'spin-slow 20s linear infinite' }}>
@@ -129,50 +131,25 @@ export default function LandingPage() {
           </div>
           <div style={{ position: 'absolute', width: '240px', height: '240px', borderRadius: '50%', border: '1px solid rgba(6,182,212,0.15)', animation: 'spin-slow 15s linear infinite reverse' }} />
 
-          <div style={{ position: 'relative', zIndex: 2, animation: 'float 4s ease-in-out infinite', filter: 'drop-shadow(0 0 30px rgba(59,130,246,0.4))' }}>
-            <svg width="220" height="280" viewBox="0 0 220 280" fill="none">
-              <rect x="60" y="20" width="100" height="80" rx="20" fill="#0D1321" stroke="#3B82F6" strokeWidth="2"/>
-              <circle cx="85" cy="55" r="12" fill="#3B82F6" opacity="0.9"/>
-              <circle cx="135" cy="55" r="12" fill="#3B82F6" opacity="0.9"/>
-              <circle cx="85" cy="55" r="6" fill="#60A5FA"/>
-              <circle cx="135" cy="55" r="6" fill="#60A5FA"/>
-              <circle cx="85" cy="55" r="3" fill="white"/>
-              <circle cx="135" cy="55" r="3" fill="white"/>
-              <line x1="110" y1="20" x2="110" y2="5" stroke="#3B82F6" strokeWidth="2"/>
-              <circle cx="110" cy="4" r="4" fill="#06B6D4"/>
-              <rect x="85" y="78" width="50" height="8" rx="4" fill="#1F2D45"/>
-              <rect x="88" y="80" width="44" height="4" rx="2" fill="#3B82F6" opacity="0.6"/>
-              <rect x="95" y="100" width="30" height="15" rx="4" fill="#0D1321" stroke="#1F2D45" strokeWidth="1"/>
-              <rect x="40" y="115" width="140" height="100" rx="20" fill="#0D1321" stroke="#3B82F6" strokeWidth="1.5"/>
-              <rect x="65" y="130" width="90" height="60" rx="10" fill="#111827" stroke="#1F2D45" strokeWidth="1"/>
-              <circle cx="90" cy="150" r="8" fill="#3B82F6" opacity="0.8"/>
-              <circle cx="110" cy="150" r="8" fill="#06B6D4" opacity="0.8"/>
-              <circle cx="130" cy="150" r="8" fill="#3B82F6" opacity="0.8"/>
-              <rect x="75" y="168" width="70" height="6" rx="3" fill="#1F2D45"/>
-              <rect x="75" y="168" width="45" height="6" rx="3" fill="#3B82F6" opacity="0.7"/>
-              <rect x="10" y="120" width="30" height="85" rx="15" fill="#0D1321" stroke="#1F2D45" strokeWidth="1.5"/>
-              <circle cx="25" cy="210" r="12" fill="#0D1321" stroke="#3B82F6" strokeWidth="1.5"/>
-              <rect x="180" y="120" width="30" height="85" rx="15" fill="#0D1321" stroke="#1F2D45" strokeWidth="1.5"/>
-              <circle cx="195" cy="210" r="12" fill="#0D1321" stroke="#3B82F6" strokeWidth="1.5"/>
-              <rect x="175" y="175" width="45" height="55" rx="5" fill="#111827" stroke="#3B82F6" strokeWidth="1.5"/>
-              <rect x="178" y="178" width="39" height="49" rx="3" fill="#0D1321"/>
-              <rect x="181" y="182" width="33" height="5" rx="2" fill="#3B82F6" opacity="0.7"/>
-              <rect x="181" y="191" width="25" height="3" rx="1" fill="#1F2D45"/>
-              <rect x="181" y="197" width="29" height="3" rx="1" fill="#1F2D45"/>
-              <rect x="181" y="203" width="20" height="3" rx="1" fill="#1F2D45"/>
-              <rect x="181" y="209" width="33" height="10" rx="3" fill="#3B82F6" opacity="0.5"/>
-              <rect x="65" y="215" width="35" height="55" rx="12" fill="#0D1321" stroke="#1F2D45" strokeWidth="1.5"/>
-              <rect x="120" y="215" width="35" height="55" rx="12" fill="#0D1321" stroke="#1F2D45" strokeWidth="1.5"/>
-              <rect x="58" y="258" width="48" height="18" rx="9" fill="#0D1321" stroke="#3B82F6" strokeWidth="1.5"/>
-              <rect x="114" y="258" width="48" height="18" rx="9" fill="#0D1321" stroke="#3B82F6" strokeWidth="1.5"/>
-            </svg>
+          {/* Robot Image */}
+          <div style={{ position: 'relative', zIndex: 2, animation: 'float 4s ease-in-out infinite' }}>
+            <img
+              src="/robot.png"
+              alt="Orion AI Robot"
+              style={{
+                width: '280px',
+                height: 'auto',
+                filter: 'drop-shadow(0 0 30px rgba(59,130,246,0.6)) drop-shadow(0 0 60px rgba(6,182,212,0.3))',
+                animation: 'robot-glow 3s ease-in-out infinite',
+              }}
+            />
           </div>
 
           {[
-            { x: -80, y: -60, text: '✉ 15 email', delay: '0s' },
-            { x: 100, y: -40, text: '◎ WA 24/7', delay: '1s' },
-            { x: -90, y: 80, text: '⬡ No Fraud', delay: '2s' },
-            { x: 95, y: 100, text: '✓ Auto Task', delay: '0.5s' },
+            { x: -100, y: -80, text: '✉ 15 email', delay: '0s' },
+            { x: 110, y: -50, text: '◎ WA 24/7', delay: '1s' },
+            { x: -110, y: 90, text: '⬡ No Fraud', delay: '2s' },
+            { x: 105, y: 110, text: '✓ Auto Task', delay: '0.5s' },
           ].map((p, i) => (
             <div key={i} style={{ position: 'absolute', left: `calc(50% + ${p.x}px)`, top: `calc(50% + ${p.y}px)`, background: 'rgba(13,19,33,0.9)', border: '1px solid rgba(59,130,246,0.3)', borderRadius: '8px', padding: '6px 10px', fontSize: '11px', color: '#60A5FA', fontWeight: 600, whiteSpace: 'nowrap', animation: 'float 4s ease-in-out infinite', animationDelay: p.delay, zIndex: 3 }}>
               {p.text}
@@ -185,8 +162,13 @@ export default function LandingPage() {
         @keyframes float { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-12px)} }
         @keyframes pulse { 0%,100%{opacity:0.6;transform:scale(1)} 50%{opacity:1;transform:scale(1.05)} }
         @keyframes spin-slow { from{transform:rotate(0deg)} to{transform:rotate(360deg)} }
+        @keyframes robot-glow {
+          0%,100%{filter:drop-shadow(0 0 20px rgba(59,130,246,0.5)) drop-shadow(0 0 40px rgba(6,182,212,0.2));}
+          50%{filter:drop-shadow(0 0 40px rgba(59,130,246,0.9)) drop-shadow(0 0 80px rgba(6,182,212,0.5)) brightness(1.1);}
+        }
       `}</style>
 
+      {/* FEATURES */}
       <section id="fitur" style={{ position: 'relative', zIndex: 1, maxWidth: '1200px', margin: '0 auto 120px', padding: '0 40px' }}>
         <div style={{ textAlign: 'center', marginBottom: '64px' }}>
           <h2 style={{ fontSize: '40px', fontWeight: 800, letterSpacing: '-1px', marginBottom: '16px' }}>Satu sistem, semua otomatis</h2>
@@ -213,6 +195,7 @@ export default function LandingPage() {
         </div>
       </section>
 
+      {/* PRICING */}
       <section style={{ position: 'relative', zIndex: 1, maxWidth: '1000px', margin: '0 auto 120px', padding: '0 40px' }}>
         <div style={{ textAlign: 'center', marginBottom: '64px' }}>
           <h2 style={{ fontSize: '40px', fontWeight: 800, letterSpacing: '-1px', marginBottom: '16px' }}>Harga yang masuk akal</h2>
@@ -244,6 +227,7 @@ export default function LandingPage() {
         </div>
       </section>
 
+      {/* FOOTER */}
       <footer style={{ position: 'relative', zIndex: 1, borderTop: '1px solid #1F2D45', padding: '40px', textAlign: 'center', color: '#4A5C78', fontSize: '13px' }}>
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px', marginBottom: '16px' }}>
           <div style={{ width: '24px', height: '24px', background: 'linear-gradient(135deg, #3B82F6, #06B6D4)', borderRadius: '6px', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '12px' }}>✦</div>
