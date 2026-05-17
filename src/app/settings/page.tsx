@@ -150,6 +150,35 @@ export default function SettingsPage() {
               </div>
             </div>
 
+            {/* SOP Bisnis */}
+            <div style={{ background: '#0D1321', border: '1px solid #1F2D45', borderRadius: '14px', padding: '24px', marginBottom: '20px' }}>
+              <div style={{ fontSize: '12px', color: '#4A5C78', fontWeight: 700, letterSpacing: '0.5px', marginBottom: '16px' }}>📋 SOP & FAQ BISNIS</div>
+              <div style={{ fontSize: '12px', color: '#8899B4', marginBottom: '12px' }}>Info ini dipakai Sales AI untuk jawab pertanyaan customer dengan tepat</div>
+              {[
+                { key: 'products', label: '🛍️ Daftar Produk & Harga', placeholder: 'Produk A: Rp 100.000
+Produk B: Rp 200.000
+Produk C: Rp 150.000' },
+                { key: 'faq', label: '❓ FAQ & Cara Order', placeholder: 'Q: Cara order?
+A: Chat WA ini dan sebutkan produk yang mau dibeli
+
+Q: Pengiriman ke mana saja?
+A: Seluruh Indonesia via JNE/J&T' },
+                { key: 'promo', label: '🎁 Promo & Diskon', placeholder: 'Promo bulan ini:
+- Diskon 10% untuk pembelian pertama
+- Free ongkir minimal Rp 300.000' },
+              ].map(sop => (
+                <div key={sop.key} style={{ marginBottom: '16px' }}>
+                  <label style={{ fontSize: '12px', color: '#8899B4', fontWeight: 600, display: 'block', marginBottom: '8px' }}>{sop.label}</label>
+                  <textarea
+                    placeholder={sop.placeholder}
+                    rows={4}
+                    id={`sop-${sop.key}`}
+                    style={{ width: '100%', padding: '10px 12px', background: '#111827', border: '1px solid #1F2D45', borderRadius: '8px', color: '#F0F4FF', fontSize: '13px', outline: 'none', fontFamily: 'inherit', resize: 'vertical', boxSizing: 'border-box', lineHeight: 1.6 }}
+                  />
+                </div>
+              ))}
+            </div>
+
             {/* Save */}
             <button onClick={saveSettings} disabled={saving} style={{ width: '100%', padding: '14px', background: 'linear-gradient(135deg, #3B82F6, #2563EB)', border: 'none', borderRadius: '10px', color: 'white', fontSize: '14px', fontWeight: 600, cursor: 'pointer', fontFamily: 'inherit', marginBottom: '20px' }}>
               {saving ? 'Menyimpan...' : saved ? '✓ Tersimpan!' : 'Simpan Pengaturan'}
