@@ -47,6 +47,16 @@ export default function Dashboard() {
     const currentUser = auth.getUser()
     if (!currentUser) { window.location.href = '/login'; return }
     setUser(currentUser)
+    // SSE real-time notifications
+    const es = new EventSource(`https://web-production-d2935.up.railway.app/chat/notifications/stream/${currentUser.user_id}`)
+    es.onmessage = (e) => {
+      try {
+        const data = JSON.parse(e.data)
+        if (data.type === 'hot_lead') alert(`🔥 HOT LEAD! ${data.phone} siap beli!`)
+        if (data.type === 'human_required') alert(`🚨 ${data.phone} butuh bantuan manual!`)
+      } catch {}
+    }
+    return () => es.close()
     const loadData = async () => {
       try {
         const [briefingData, waData] = await Promise.all([
