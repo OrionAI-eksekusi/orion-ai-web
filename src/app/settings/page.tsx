@@ -2,28 +2,53 @@
 
 import { useState, useEffect } from 'react'
 import { auth } from '@/lib/auth'
-import { api } from '@/lib/api'
+
+const BACKEND = 'https://web-production-d2935.up.railway.app'
 
 export default function SettingsPage() {
   const [user, setUser] = useState<any>(null)
-  const [plan, setPlan] = useState<any>(null)
-  const [loading, setLoading] = useState(true)
+  const [phone, setPhone] = useState('')
+  const [businessName, setBusinessName] = useState('')
+  const [businessContext, setBusinessContext] = useState('')
+  const [saving, setSaving] = useState(false)
+  const [saved, setSaved] = useState(false)
 
   useEffect(() => {
     const currentUser = auth.getUser()
     if (!currentUser) { window.location.href = '/login'; return }
     setUser(currentUser)
-    loadData(currentUser.user_id)
+    loadProfile(currentUser.user_id)
   }, [])
 
-  const loadData = async (userId: string) => {
+  const loadProfile = async (userId: string) => {
     try {
-      const planData = await api.getUserPlan(userId)
-      setPlan(planData)
+      const res = await fetch(`${BACKEND}/chat/user-profile/${userId}`)
+      const data = await res.json()
+      setPhone(data?.phone || '')
+      setBusinessName(data?.business_name || '')
+      setBusinessContext(data?.business_context || '')
+    } catch (e) {}
+  }
+
+  const saveSettings = async () => {
+    if (!user) return
+    setSaving(true)
+    try {
+      await fetch(`${BACKEND}/chat/update-profile`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          user_id: user.user_id,
+          phone,
+          business_name: businessName,
+          business_context: businessContext,
+        })
+      })
+      setSaved(true)
+      setTimeout(() => setSaved(false), 3000)
     } catch (e) {
-      console.log('Error:', e)
     } finally {
-      setLoading(false)
+      setSaving(false)
     }
   }
 
@@ -68,7 +93,7 @@ export default function SettingsPage() {
         <div style={{ borderBottom: '1px solid #1F2D45', padding: '0 28px', height: '60px', display: 'flex', alignItems: 'center', backgroundColor: '#0A0F1E', flexShrink: 0 }}>
           <div>
             <div style={{ fontSize: '16px', fontWeight: 700 }}>⚙ Settings</div>
-            <div style={{ fontSize: '11px', color: '#4A5C78' }}>Profil, plan, dan pengaturan akun</div>
+            <div style={{ fontSize: '11px', color: '#4A5C78' }}>Profil, bisnis, dan pengaturan akun</div>
           </div>
         </div>
 
@@ -78,42 +103,75 @@ export default function SettingsPage() {
             {/* Profile */}
             <div style={{ background: '#0D1321', border: '1px solid #1F2D45', borderRadius: '14px', padding: '24px', marginBottom: '20px' }}>
               <div style={{ fontSize: '12px', color: '#4A5C78', fontWeight: 700, letterSpacing: '0.5px', marginBottom: '16px' }}>PROFIL</div>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '16px', marginBottom: '20px' }}>
                 <div style={{ width: '56px', height: '56px', borderRadius: '50%', background: 'linear-gradient(135deg, #3B82F6, #06B6D4)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '22px', fontWeight: 700 }}>
                   {user?.name?.charAt(0) || 'U'}
                 </div>
                 <div>
-                  <div style={{ fontSize: '18px', fontWeight: 700, marginBottom: '4px' }}>{user?.name || 'User'}</div>
+                  <div style={{ fontSize: '18px', fontWeight: 700 }}>{user?.name}</div>
                   <div style={{ fontSize: '13px', color: '#8899B4' }}>{user?.email}</div>
                   <div style={{ fontSize: '11px', color: '#10B981', marginTop: '4px' }}>✓ Gmail Connected</div>
                 </div>
               </div>
+              <div style={{ marginBottom: '16px' }}>
+                <label style={{ fontSize: '12px', color: '#8899B4', fontWeight: 600, display: 'block', marginBottom: '8px' }}>📱 Nomor WA untuk Smart Briefing</label>
+                <input
+                  value={phone}
+                  onChange={e => setPhone(e.target.value)}
+                  placeholder="628xxxxxxxxxx"
+                  style={{ width: '100%', padding: '10px 12px', background: '#111827', border: '1px solid #1F2D45', borderRadius: '8px', color: '#F0F4FF', fontSize: '13px', outline: 'none', fontFamily: 'inherit', boxSizing: 'border-box' }}
+                />
+                <div style={{ fontSize: '11px', color: '#4A5C78', marginTop: '4px' }}>Briefing dikirim ke nomor ini setiap jam 06.00 pagi</div>
+              </div>
             </div>
+
+            {/* Business Context */}
+            <div style={{ background: '#0D1321', border: '1px solid #1F2D45', borderRadius: '14px', padding: '24px', marginBottom: '20px' }}>
+              <div style={{ fontSize: '12px', color: '#4A5C78', fontWeight: 700, letterSpacing: '0.5px', marginBottom: '16px' }}>PROFIL BISNIS</div>
+              <div style={{ marginBottom: '16px' }}>
+                <label style={{ fontSize: '12px', color: '#8899B4', fontWeight: 600, display: 'block', marginBottom: '8px' }}>Nama Bisnis</label>
+                <input
+                  value={businessName}
+                  onChange={e => setBusinessName(e.target.value)}
+                  placeholder="Toko Maju Jaya / PT Orion Indonesia"
+                  style={{ width: '100%', padding: '10px 12px', background: '#111827', border: '1px solid #1F2D45', borderRadius: '8px', color: '#F0F4FF', fontSize: '13px', outline: 'none', fontFamily: 'inherit', boxSizing: 'border-box' }}
+                />
+              </div>
+              <div>
+                <label style={{ fontSize: '12px', color: '#8899B4', fontWeight: 600, display: 'block', marginBottom: '8px' }}>Deskripsi Bisnis & Produk</label>
+                <textarea
+                  value={businessContext}
+                  onChange={e => setBusinessContext(e.target.value)}
+                  placeholder="Kami menjual... Produk unggulan kami... Harga mulai dari... Target customer kami..."
+                  rows={5}
+                  style={{ width: '100%', padding: '10px 12px', background: '#111827', border: '1px solid #1F2D45', borderRadius: '8px', color: '#F0F4FF', fontSize: '13px', outline: 'none', fontFamily: 'inherit', resize: 'vertical', boxSizing: 'border-box', lineHeight: 1.6 }}
+                />
+                <div style={{ fontSize: '11px', color: '#4A5C78', marginTop: '4px' }}>AI Sales akan pakai info ini untuk balas WA customer kamu</div>
+              </div>
+            </div>
+
+            {/* Save */}
+            <button onClick={saveSettings} disabled={saving} style={{ width: '100%', padding: '14px', background: 'linear-gradient(135deg, #3B82F6, #2563EB)', border: 'none', borderRadius: '10px', color: 'white', fontSize: '14px', fontWeight: 600, cursor: 'pointer', fontFamily: 'inherit', marginBottom: '20px' }}>
+              {saving ? 'Menyimpan...' : saved ? '✓ Tersimpan!' : 'Simpan Pengaturan'}
+            </button>
 
             {/* Plan */}
             <div style={{ background: '#0D1321', border: '1px solid #1F2D45', borderRadius: '14px', padding: '24px', marginBottom: '20px' }}>
               <div style={{ fontSize: '12px', color: '#4A5C78', fontWeight: 700, letterSpacing: '0.5px', marginBottom: '16px' }}>PLAN AKTIF</div>
               <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
                 <div>
-                  <div style={{ fontSize: '20px', fontWeight: 800, color: user?.plan === 'zenith' ? '#F59E0B' : '#60A5FA', marginBottom: '4px' }}>
-                    {user?.plan?.toUpperCase() || 'FREE'}
-                  </div>
+                  <div style={{ fontSize: '20px', fontWeight: 800, color: user?.plan === 'zenith' ? '#F59E0B' : '#60A5FA' }}>{user?.plan?.toUpperCase() || 'FREE'}</div>
                   <div style={{ fontSize: '13px', color: '#8899B4' }}>
-                    {user?.plan === 'trial' ? `Trial berakhir dalam ${user?.trial_days_left || 0} hari` :
-                     user?.plan === 'apex' ? '100 perintah/hari' :
-                     user?.plan === 'zenith' ? '200 perintah/hari' :
-                     '10 perintah/hari'}
+                    {user?.plan === 'trial' ? `Trial berakhir dalam ${user?.trial_days_left || 0} hari` : user?.plan === 'apex' ? '100 perintah/hari' : user?.plan === 'zenith' ? '200 perintah/hari' : '10 perintah/hari'}
                   </div>
                 </div>
                 {['free', 'trial'].includes(user?.plan) && (
-                  <a href="/upgrade" style={{ padding: '10px 20px', background: 'linear-gradient(135deg, #3B82F6, #2563EB)', borderRadius: '8px', color: 'white', fontSize: '13px', fontWeight: 600, textDecoration: 'none' }}>
-                    Upgrade →
-                  </a>
+                  <a href="/upgrade" style={{ padding: '10px 20px', background: 'linear-gradient(135deg, #3B82F6, #2563EB)', borderRadius: '8px', color: 'white', fontSize: '13px', fontWeight: 600, textDecoration: 'none' }}>Upgrade →</a>
                 )}
               </div>
             </div>
 
-            {/* Danger zone */}
+            {/* Danger */}
             <div style={{ background: '#0D1321', border: '1px solid rgba(239,68,68,0.2)', borderRadius: '14px', padding: '24px' }}>
               <div style={{ fontSize: '12px', color: '#EF4444', fontWeight: 700, letterSpacing: '0.5px', marginBottom: '16px' }}>DANGER ZONE</div>
               <button onClick={() => auth.logout()} style={{ padding: '10px 20px', background: 'rgba(239,68,68,0.1)', border: '1px solid rgba(239,68,68,0.2)', borderRadius: '8px', color: '#EF4444', fontSize: '13px', fontWeight: 600, cursor: 'pointer', fontFamily: 'inherit' }}>
