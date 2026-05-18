@@ -57,7 +57,6 @@ export default function Dashboard() {
         if (data.type === 'human_required') alert(`🚨 ${data.phone} butuh bantuan manual!`)
       } catch {}
     }
-    return () => es.close()
     const loadData = async () => {
       // Email — independent, tidak block yang lain
       api.getEmails(currentUser!.user_id)
@@ -77,6 +76,7 @@ export default function Dashboard() {
       }
     }
     loadData()
+    return () => es.close()
   }, [])
 
   const sendCommand = async () => {
