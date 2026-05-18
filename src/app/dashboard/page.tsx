@@ -49,7 +49,7 @@ export default function Dashboard() {
     if (!currentUser) { window.location.href = '/login'; return }
     setUser(currentUser)
     // SSE real-time notifications
-    const es = new EventSource(`https://web-production-d2935.up.railway.app/chat/notifications/stream/${currentUser.user_id}`)
+    const es = new EventSource(`https://web-production-d2935.up.railway.app/chat/notifications/stream/${currentUser!.user_id}`)
     es.onmessage = (e) => {
       try {
         const data = JSON.parse(e.data)
@@ -66,8 +66,8 @@ export default function Dashboard() {
         ])
         setBriefing(briefingData)
         setWaStatus(waData)
-        if (['trial', 'zenith'].includes(currentUser.plan)) {
-          const anomalyData = await api.getAnomalies(currentUser.user_id)
+        if (['trial', 'zenith'].includes(currentUser!.plan)) {
+          const anomalyData = await api.getAnomalies(currentUser!.user_id)
           setAnomalies(anomalyData?.data?.anomalies || [])
         }
       } catch (e) { console.log('Error:', e) }
