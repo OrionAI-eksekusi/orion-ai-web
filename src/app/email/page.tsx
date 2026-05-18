@@ -10,6 +10,10 @@ export default function EmailPage() {
   const [selected, setSelected] = useState<any>(null)
   const [loading, setLoading] = useState(true)
   const [briefing, setBriefing] = useState<any>(null)
+  const [replyText, setReplyText] = useState('')
+  const [replying, setReplying] = useState(false)
+  const [generating, setGenerating] = useState(false)
+  const [sent, setSent] = useState(false)
 
   useEffect(() => {
     const currentUser = auth.getUser()
@@ -17,6 +21,47 @@ export default function EmailPage() {
     setUser(currentUser)
     loadData(currentUser.user_id)
   }, [])
+
+  const generateReply = async () => {
+    if (!selected || !user) return
+    setGenerating(true)
+    try {
+      const res = await fetch(`https://web-production-d2935.up.railway.app/chat/`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          user_id: user.user_id,
+          message: `Buatkan draft balasan profesional untuk email ini:\nDari: ${selected.from || selected.sender}\nSubjek: ${selected.subject}\nIsi: ${selected.preview || selected.body || selected.summary || ''}\n\nCukup tulis draft balasannya saja tanpa penjelasan.`
+        })
+      })
+      const data = await res.json()
+      const reply = data?.parsed?.reply || data?.response || ''
+      setReplyText(reply)
+    } catch(e) { console.log(e) }
+    setGenerating(false)
+  }
+
+  const sendReply = async () => {
+    if (!replyText.trim() || !selected || !user) return
+    setReplying(true)
+    try {
+      const replyTo = selected.reply_to || selected.from || selected.sender || ''
+      await fetch('https://web-production-d2935.up.railway.app/chat/send-email', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          user_id: user.user_id,
+          to: replyTo,
+          subject: `Re: ${selected.subject || ''}`,
+          body: replyText
+        })
+      })
+      setSent(true)
+      setReplyText('')
+      setTimeout(() => setSent(false), 3000)
+    } catch(e) { console.log(e) }
+    setReplying(false)
+  }
 
   const loadData = async (userId: string) => {
     try {
@@ -152,15 +197,28 @@ export default function EmailPage() {
                   </div>
                 </div>
 
-                {selected.suggested_reply && (
-                  <div style={{ background: 'rgba(16,185,129,0.06)', border: '1px solid rgba(16,185,129,0.15)', borderRadius: '12px', padding: '16px' }}>
-                    <div style={{ fontSize: '11px', color: '#10B981', fontWeight: 700, marginBottom: '8px' }}>✦ DRAFT BALASAN AI</div>
-                    <div style={{ fontSize: '13px', color: '#D1D9E6', lineHeight: 1.7, marginBottom: '12px' }}>{selected.suggested_reply}</div>
-                    <button style={{ padding: '8px 16px', background: 'linear-gradient(135deg, #10B981, #059669)', border: 'none', borderRadius: '8px', color: 'white', fontSize: '13px', fontWeight: 600, cursor: 'pointer', fontFamily: 'inherit' }}>
-                      Kirim Balasan ✓
+                <div style={{ background: 'rgba(16,185,129,0.06)', border: '1px solid rgba(16,185,129,0.15)', borderRadius: '12px', padding: '16px' }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '12px' }}>
+                    <div style={{ fontSize: '11px', color: '#10B981', fontWeight: 700 }}>✦ BALAS EMAIL</div>
+                    <button onClick={generateReply} disabled={generating} style={{ padding: '6px 12px', background: 'rgba(59,130,246,0.15)', border: '1px solid rgba(59,130,246,0.3)', borderRadius: '6px', color: '#60A5FA', fontSize: '11px', fontWeight: 600, cursor: 'pointer', fontFamily: 'inherit' }}>
+                      {generating ? '⏳ Generating...' : '✦ Generate AI Draft'}
                     </button>
                   </div>
-                )}
+                  <textarea
+                    value={replyText}
+                    onChange={e => setReplyText(e.target.value)}
+                    placeholder="Tulis balasan atau klik Generate AI Draft..."
+                    style={{ width: '100%', minHeight: '120px', background: '#0D1321', border: '1px solid #1F2D45', borderRadius: '8px', padding: '12px', color: '#D1D9E6', fontSize: '13px', fontFamily: 'inherit', resize: 'vertical', outline: 'none', boxSizing: 'border-box' }}
+                  />
+                  <div style={{ display: 'flex', gap: '8px', marginTop: '10px' }}>
+                    <button onClick={sendReply} disabled={replying || !replyText.trim()} style={{ padding: '8px 20px', background: sent ? 'rgba(16,185,129,0.8)' : 'linear-gradient(135deg, #10B981, #059669)', border: 'none', borderRadius: '8px', color: 'white', fontSize: '13px', fontWeight: 600, cursor: 'pointer', fontFamily: 'inherit', opacity: (!replyText.trim() || replying) ? 0.5 : 1 }}>
+                      {sent ? '✅ Terkirim!' : replying ? '⏳ Mengirim...' : '✉ Kirim Balasan'}
+                    </button>
+                    <button onClick={() => setReplyText('')} style={{ padding: '8px 16px', background: 'transparent', border: '1px solid #1F2D45', borderRadius: '8px', color: '#8899B4', fontSize: '13px', cursor: 'pointer', fontFamily: 'inherit' }}>
+                      Bersihkan
+                    </button>
+                  </div>
+                </div>
               </div>
             ) : (
               <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '100%', color: '#4A5C78', fontSize: '14px' }}>
