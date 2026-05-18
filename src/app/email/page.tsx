@@ -22,6 +22,15 @@ export default function EmailPage() {
     loadData(currentUser.user_id)
   }, [])
 
+  // Auto-generate draft saat email dipilih
+  useEffect(() => {
+    if (selected && user) {
+      setReplyText('')
+      setSent(false)
+      generateReply()
+    }
+  }, [selected])
+
   const generateReply = async () => {
     if (!selected || !user) return
     setGenerating(true)
