@@ -61,8 +61,8 @@ export default function Dashboard() {
     const loadData = async () => {
       try {
         const [briefingData, waData] = await Promise.all([
-          api.getEmails(currentUser.user_id),
-          api.getWaStatus(currentUser.user_id),
+          api.getEmails(currentUser!.user_id),
+          api.getWaStatus(currentUser!.user_id),
         ])
         setBriefing(briefingData)
         setWaStatus(waData)
