@@ -59,18 +59,22 @@ export default function Dashboard() {
     }
     return () => es.close()
     const loadData = async () => {
-      try {
-        const [briefingData, waData] = await Promise.all([
-          api.getEmails(currentUser!.user_id),
-          api.getWaStatus(currentUser!.user_id),
-        ])
-        setBriefing(briefingData)
-        setWaStatus(waData)
-        if (['trial', 'zenith'].includes(currentUser!.plan)) {
-          const anomalyData = await api.getAnomalies(currentUser!.user_id)
-          setAnomalies(anomalyData?.data?.anomalies || [])
-        }
-      } catch (e) { console.log('Error:', e) }
+      // Email — independent, tidak block yang lain
+      api.getEmails(currentUser!.user_id)
+        .then(data => setBriefing(data))
+        .catch(e => console.log('[EMAIL ERROR]', e))
+
+      // WA Status — independent
+      api.getWaStatus(currentUser!.user_id)
+        .then(data => setWaStatus(data))
+        .catch(e => console.log('[WA ERROR]', e))
+
+      // Anomaly — hanya untuk trial/zenith
+      if (['trial', 'zenith'].includes(currentUser!.plan)) {
+        api.getAnomalies(currentUser!.user_id)
+          .then(data => setAnomalies(data?.data?.anomalies || []))
+          .catch(e => console.log('[ANOMALY ERROR]', e))
+      }
     }
     loadData()
   }, [])
