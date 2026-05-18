@@ -1,5 +1,6 @@
 'use client'
 import { useEffect, useState } from 'react'
+import { auth } from '@/lib/auth'
 
 const API = process.env.NEXT_PUBLIC_API_URL || 'https://web-production-d2935.up.railway.app'
 
@@ -10,10 +11,10 @@ export default function CalendarPage() {
   const [userId, setUserId] = useState('')
 
   useEffect(() => {
-    const u = localStorage.getItem('user_id') || ''
-    setUserId(u)
-    if (!u) { window.location.href = '/login'; return }
-    fetchEvents(u)
+    const currentUser = auth.getUser()
+    if (!currentUser) { window.location.href = '/login'; return }
+    setUserId(currentUser.user_id)
+    fetchEvents(currentUser.user_id)
   }, [])
 
   const fetchEvents = async (uid: string) => {
