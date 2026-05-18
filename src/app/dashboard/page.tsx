@@ -61,7 +61,7 @@ export default function Dashboard() {
     const loadData = async () => {
       // Email — independent, tidak block yang lain
       api.getEmails(currentUser!.user_id)
-        .then(data => setBriefing(data))
+        .then(data => { console.log('[EMAIL DATA]', data); setBriefing(data) })
         .catch(e => console.log('[EMAIL ERROR]', e))
 
       // WA Status — independent
