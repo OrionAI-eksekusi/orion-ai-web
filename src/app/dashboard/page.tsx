@@ -10,6 +10,7 @@ const sidebarItems = [
   { icon: '◎', label: 'WhatsApp', path: '/whatsapp' },
   { icon: '✓', label: 'Tasks', path: '/tasks' },
   { icon: '◉', label: 'Broadcast', path: '/broadcast' },
+  { icon: '📅', label: 'Calendar', path: '/calendar' },
   { icon: '📄', label: 'Quotation', path: '/quotation' },
 ]
 
