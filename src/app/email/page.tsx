@@ -29,7 +29,7 @@ export default function EmailPage() {
       setSent(false)
       generateReply()
     }
-  }, [selected])
+  }, [selected, user])
 
   const generateReply = async () => {
     if (!selected || !user) return
