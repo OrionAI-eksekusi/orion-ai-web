@@ -35,17 +35,23 @@ export default function EmailPage() {
     if (!selected || !user) return
     setGenerating(true)
     try {
-      const res = await fetch(`https://web-production-d2935.up.railway.app/chat/`, {
+      const emailRes = await fetch(`https://web-production-d2935.up.railway.app/chat/emails?user_id=${user.user_id}`)
+      const emailData = await emailRes.json()
+      const fullEmail = emailData?.emails?.find((e: any) => e.subject === selected.subject)
+      const emailBody = fullEmail?.body || selected.preview || selected.summary || ''
+
+      const res = await fetch('https://web-production-d2935.up.railway.app/chat/generate-email-reply', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           user_id: user.user_id,
-          message: `Buatkan draft balasan profesional untuk email ini:\nDari: ${selected.from || selected.sender}\nSubjek: ${selected.subject}\nIsi: ${selected.preview || selected.body || selected.summary || ''}\n\nCukup tulis draft balasannya saja tanpa penjelasan.`
+          from: selected.from || selected.sender || '',
+          subject: selected.subject || '',
+          body: emailBody,
         })
       })
       const data = await res.json()
-      const reply = data?.parsed?.reply || data?.response || ''
-      setReplyText(reply)
+      setReplyText(data?.reply || '')
     } catch(e) { console.log(e) }
     setGenerating(false)
   }
